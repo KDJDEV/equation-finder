@@ -1,0 +1,16 @@
+span{
+    border:none;
+    min-width: 10px;
+    display: inline-block;
+}
+
+h5{
+    margin-bottom: 2px;
+}
+p{
+    margin:0;
+    font-size: 15px;
+}
+.py-terminal{
+    max-height: 200px;
+}
