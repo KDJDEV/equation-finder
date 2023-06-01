@@ -15,29 +15,35 @@ def formatZero(number): #prevents zero from showing up as -0.0, because that bug
 
 def updateGraph(p):
     p = sorted(p, key=lambda x: x[0]) #sort by x value
-    derivativeDecreasing = False
-    if (p[0][1] > p[1][1]):
-        derivativeDecreasing = True
-        if ((p[0][1] - p[1][1])/(p[1][0] - p[0][0]) > (p[1][1] - p[2][1])/(p[2][0] - p[1][0])):
-            derivativeDecreasing = True
+    negativeInFront = False
+    guessForA = 1
+    if (p[0][1] > p[1][1]): #if it is decreasing
+        if ((p[1][1] - p[0][1])/(p[1][0] - p[0][0]) > (p[2][1] - p[1][1])/(p[2][0] - p[1][0])): #if it is decreasing faster and faster
+            negativeInFront = True
+        else:
+            guessForA = -1
+    if (p[0][1] < p[1][1]): #if it is increasing
+        if ((p[1][1] - p[0][1])/(p[1][0] - p[0][0]) > (p[2][1] - p[1][1])/(p[2][0] - p[1][0])): #if it is increasing, but ever more slowly
+            guessForA = -1
+            negativeInFront = True
             
     plt.clf()
     def functionWithRootOfA(a):
-        if (not derivativeDecreasing):
+        if (not negativeInFront):
             return (p[1][1]-p[0][1])/(np.exp(p[1][0]*a)-np.exp(p[0][0]*a))-(p[2][1]-p[0][1])/(np.exp(p[2][0]*a)-np.exp(p[0][0]*a))
         else:
             return (p[0][1]-p[1][1])/(np.exp(p[1][0]*a)-np.exp(p[0][0]*a))-(p[0][1]-p[2][1])/(np.exp(p[2][0]*a)-np.exp(p[0][0]*a))
        
     a = None
     try:
-        a = fsolve(functionWithRootOfA, 1)[0]
+        a = fsolve(functionWithRootOfA, guessForA)[0]
     except:
         a = None
         print(f"Unable to find function for the given points:\n ({p[0][0]}, {p[0][1]}), ({p[1][0]}, {p[1][1]}), ({p[2][0]}, {p[2][1]})")
     if a != None:
         b = None
         c = None
-        if (not derivativeDecreasing):
+        if (not negativeInFront):
             b = (1/a)*np.log((p[1][1]-p[0][1])/(np.exp(p[1][0]*a)-np.exp(p[0][0]*a)))
             c = p[0][1]-np.exp(a*(p[0][0]+b))
         else:
@@ -45,7 +51,7 @@ def updateGraph(p):
             c = p[0][1]+np.exp(a*(p[0][0]+b))
 
         def function(x):
-            if (not derivativeDecreasing):
+            if (not negativeInFront):
                 return math.e ** (a * (x + b)) + c
             else:
                 return -math.e ** (a * (x + b)) + c
@@ -69,7 +75,8 @@ def updateGraph(p):
 
         plt.xlabel('x')
         plt.ylabel('y')
-        plt.title(f"Plot of approximately e^({str(formatZero(round(a, 4)))}(x + {str(formatZero(round(b, 4)))})) + {str(formatZero(round(c, 4)))}")
+        sign = "-" if negativeInFront else ""
+        plt.title(f"Plot of approximately {sign}e^({str(formatZero(round(a, 4)))}(x + {str(formatZero(round(b, 4)))})) + {str(formatZero(round(c, 4)))}")
         plt.grid(True)
         Element("plot").write(plt)
 
