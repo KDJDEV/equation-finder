@@ -1,6 +1,6 @@
 from js import document
 from pyodide.ffi import create_proxy
-from scipy.optimize import fsolve
+from scipy.optimize import root
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -42,32 +42,31 @@ def updateGraph(p):
         eq = C1N / C1D - C2N / C2D
         return eq
 
-    b = None
-    try:
-        b = fsolve(functionWithRootOfB, guessForB)[0]
-    except:
-        b = None
-        print(
-            f"Unable to find function for the given points:\n ({p[0][0]}, {p[0][1]}), ({p[1][0]}, {p[1][1]}), ({p[2][0]}, {p[2][1]})")
+    def findB():
+        try:
+            result = root(functionWithRootOfB, guessForB, method="lm") #After experimentation, I found that the lm (Levenberg-Marquardt) method works best ¯\_(ツ)_/¯
+            return float(result.x)
+        except:
+            print(
+                f"Unable to find function for the given points: ({p[0][0]}, {p[0][1]}), ({p[1][0]}, {p[1][1]}), ({p[2][0]}, {p[2][1]})\n")
+            
+            """
+            Uncomment to plot functionWithRootOfB
+            x = np.linspace(0, 0.01, num=10000000)
+            y = functionWithRootOfB(x)
+            plt.plot(x, y)
+
+            plt.xlabel('x')
+            plt.ylabel('y')
+
+            plt.grid(True)
+            Element("plot").write(plt)
+            """
         
-        """
-        plot functionWithRootOfB
-        x = np.linspace(-100, 1000000000000000000000, num=10000000)
-        y = functionWithRootOfB(x)
-        plt.plot(x, y)
+            return None
 
-        plt.xlabel('x')
-        plt.ylabel('y')
-
-        plt.grid(True)
-        Element("plot").write(plt)
-        """
-        
-
+    b = findB()
     if b != None:
-        a = None
-        c = None
-
         termA = ((x1 + 1/b) * np.log(b * x1 + 1) - x1)
         termB = ((x3 + 1/b) * np.log(b * x3 + 1) - x3)
         cN = y3 * termA - y1 * termB
@@ -102,10 +101,16 @@ def updateGraph(p):
 
         def formatNum(num):
             return str(formatZero(round(num, 4)))
-        plt.title(
-            f"Plot of approximately y={formatNum(a)}*((x+1/{formatNum(b)})*ln({formatNum(b)}*x+1)-x){formatNum(c)}*x")
+        def longFormatNum(num):
+            return "{:.20f}".format(formatZero(num))
+        eq = f"y={longFormatNum(a)}*((x+1/{longFormatNum(b)})*ln({longFormatNum(b)}*x+1)-x)+{longFormatNum(c)}*x" #This one rounds to 20 decimals for more precision than roundedEq
+        roundedEq = f"y={formatNum(a)}*((x+1/{formatNum(b)})*ln({formatNum(b)}*x+1)-x)+{formatNum(c)}*x"
+        titleText = f"Plot of approximately {roundedEq}"
+        plt.title(titleText, fontsize=12)
         plt.grid(True)
         Element("plot").write(plt)
+
+        print(f"Found function for the given points: ({p[0][0]}, {p[0][1]}), ({p[1][0]}, {p[1][1]}), ({p[2][0]}, {p[2][1]}) \nHere it is with lots of decimals for more precision: \n{eq}\n")
 
 
 def inputChanged(e):
