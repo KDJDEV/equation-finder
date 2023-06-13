@@ -80,8 +80,8 @@ def log(p):
 
     b = findB()
     if b != None:
-        a = (p[1][1]-p[0][1])/(np.log(p[1][0]+b)-np.log(p[0][0]+b))
-        c = p[0][1]-a*np.log(p[0][0]+b)
+        a = (y2-y1)/(np.log(x2+b)-np.log(x1+b))
+        c = y1-a*np.log(x1+b)
 
         def function(x):
             #y=A*ln(x+B) + C
