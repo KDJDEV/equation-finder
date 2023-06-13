@@ -2,34 +2,100 @@
 
 <head>
     <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
-    <link rel="stylesheet" href="styles.css"/>
+    <link rel="stylesheet" href="styles.css" />
 
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
 
+    <script>
+        functionType = location.search.split('func=')[1]
 
-    <py-config type="json">
-        {
-          "packages": ["numpy", "scipy", "matplotlib"]
+        function waitForElement(selector, callback) {
+            const element = document.querySelector(selector);
+
+            if (element) {
+                callback(element);
+            } else {
+                setTimeout(() => waitForElement(selector, callback), 100); // Check again after 100 milliseconds
+            }
         }
+
+        if (functionType == "doozy" || functionType == "exp" || functionType == "log") {
+            waitForElement("#title", (element) => { element.innerText = functionType })
+        } else {
+            waitForElement("#title", (element) => { element.innerText = `Invalid URL query qarameter func=${functionType}` })
+        }
+
+        //set default points
+        if (functionType == "exp") {
+            waitForElement("#point1x", (element) => { element.innerText = 1 })
+            waitForElement("#point2x", (element) => { element.innerText = 2 })
+            waitForElement("#point3x", (element) => { element.innerText = 3 })
+            waitForElement("#point1y", (element) => { element.innerText = 2 })
+            waitForElement("#point2y", (element) => { element.innerText = 4 })
+            waitForElement("#point3y", (element) => { element.innerText = 8 })
+        }
+        if (functionType == "log") {
+            waitForElement("#point1x", (element) => { element.innerText = 1 })
+            waitForElement("#point2x", (element) => { element.innerText = 2 })
+            waitForElement("#point3x", (element) => { element.innerText = 3 })
+            waitForElement("#point1y", (element) => { element.innerText = 0 })
+            waitForElement("#point2y", (element) => { element.innerText = 0.693 })
+            waitForElement("#point3y", (element) => { element.innerText = 1.1 })
+        }
+        if (functionType == "doozy") {
+            waitForElement("#point1x", (element) => { element.innerText = 781 })
+            waitForElement("#point2x", (element) => { element.innerText = 23000 })
+            waitForElement("#point3x", (element) => { element.innerText = 114040 })
+            waitForElement("#point1y", (element) => { element.innerText = 225 })
+            waitForElement("#point2y", (element) => { element.innerText = 7269 })
+            waitForElement("#point3y", (element) => { element.innerText = 39099 })
+        }
+
+        waitForElement("#loadingText", (loadingText) => {
+            end = ""
+            function updateLoadingText() {
+                if (end !== "...") {
+                    end += "."
+                } else {
+                    end = ""
+                }
+                loadingText.innerText = "Please wait while Python is loading" + end
+
+            }
+            window.setInterval(updateLoadingText, 500);
+        })
+    </script>
+
+    <py-config type="toml">
+        packages = ["numpy", "scipy", "matplotlib"]
+
+        [[fetch]]
+        files = ["./utils.py", "./functions.py"]
     </py-config>
 </head>
 
 
 <body>
-    <div id="plot"></div>
+    <h1 id="title"></h1>
 
     <h5>Point 1</h5>
-    (<span id="point1x" contenteditable="true">781</span>, <span id="point1y" contenteditable="true">225</span>)
+    (<span id="point1x" contenteditable="true">0</span>, <span id="point1y" contenteditable="true">0</span>)
 
     <h5>Point 2</h5>
-    (<span id="point2x" contenteditable="true">23000</span>, <span id="point2y" contenteditable="true">7269</span>)
+    (<span id="point2x" contenteditable="true">0</span>, <span id="point2y" contenteditable="true">0</span>)
 
     <h5>Point 3</h5>
-    (<span id="point3x" contenteditable="true">114040</span>, <span id="point3y" contenteditable="true">39099</span>)
-    
+    (<span id="point3x" contenteditable="true">0</span>, <span id="point3y" contenteditable="true">0</span>)
+
     <p>*Click on coordinates to edit points*</p>
-    
-    <py-script src="doozyEquationForBrowser.py"></py-script>
+
+    <button id="findButton">Find</button>
+    <p id="output"></p>
+    <div id="plot"></div>
+
+    <p id="loadingText">Please wait while Python is loading</p>
+
+    <py-script src="main.py"></py-script>
 </body>
 
 </html>

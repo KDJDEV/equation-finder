@@ -14,3 +14,17 @@ p{
 .py-terminal{
     max-height: 200px;
 }
+
+#output {
+    margin-top: 15px !important;
+    font-weight: bold;
+    margin:auto;
+}
+img{
+    margin:auto;
+    display: block;
+}
+#loadingText{
+    font-weight: bold;
+    font-size: 20px;
+}
