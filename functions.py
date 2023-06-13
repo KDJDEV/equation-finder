@@ -1,4 +1,3 @@
-from js import document
 from scipy.optimize import root
 import numpy as np
 import warnings
