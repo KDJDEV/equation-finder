@@ -22,7 +22,7 @@
         if (functionType == "doozy" || functionType == "exp" || functionType == "log") {
             waitForElement("#title", (element) => { element.innerText = functionType })
         } else {
-            waitForElement("#title", (element) => { element.innerText = `Invalid URL query qarameter func=${functionType}` })
+            waitForElement("#title", (element) => { element.innerText = 'Invalid or no URL query parameter. Please provide one of the following valid values for the "func" parameter: "exp", "log", or "doozy".' })
         }
 
         //set default points
